@@ -22,7 +22,7 @@ ti = time.time()
 timestamp = int(ti).to_bytes(8, byteorder="big")
 v = 1
 version = v.to_bytes(4, byteorder="big")
-difficulty = diff()
+difficulty = diff().to_bytes(16, byteorder="big")
 targ = target
 
 
