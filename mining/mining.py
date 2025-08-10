@@ -3,6 +3,11 @@ import time
 import os
 import random
 
+def rng():
+  rngd = os.urandom(32)
+  sharng = hashlib.sha256(rngd).hexdigest()
+  return sharng
+
 def diff():
   ranges = random.randint(1, 32)
   drn = os.urandom(ranges)
@@ -17,10 +22,6 @@ version = 1
 difficulty = diff()
 targ = target
 
-def rng():
-  rngd = os.urandom(32)
-  sharng = hashlib.sha256(rngd).hexdigest()
-  return sharng
 
 def pseudoblock():
   nonce = random.randint(1, 2**32)
@@ -29,7 +30,7 @@ def pseudoblock():
 
 def mine():
   yourHash = pseudoblock()
-  while yourHash !<= target:
+  while yourHash > target:
     yourHash = pseudoblock()
     mine()
   print("SOLVED")
