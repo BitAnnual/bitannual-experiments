@@ -1,23 +1,53 @@
-import os
+from bip32utils import BIP32Key
+from mnemonic import Mnemonic
+from termcolor import colored
 import hashlib
-import ecdsa
 import base58
+import time
+import os
 
+wallet = ""
 private = ""
 public = ""
-wallet = ""
+seedphrase = ""
+obj = Mnemonic("english")
 
-def generate():
-  privbyte = os.urandom(32)
-  private = privbyte.hex()
+def gen():
+  global wallet, private, public, seedphrase
 
-  signing = ecdsa.SigningKey.from_string(privbyte, curve=ecdsa.SECP256k1)
-  verifying = signing.verifying_key
-  pubbyte = verifying.to_string()
-  public = pubbyte.hex()
+  entropy = os.urandom(16)
+  seedphrase = obj.to_mnemonic(entropy)
+  seed = obj.to_seed(seedphrase, passphrase="")
 
-  salt = os.urandom(10)
-  sha = hashlib.sha256(pubbyte + salt).digest()
-  b58 = base58.b58encode(sha).decode()
+  master = BIP32Key.fromEntropy(seed)
+  private = master.PrivateKey().hex()
+  public = master.PublicKey().hex()
 
-  wallet = "Ba" + b58 + "aB"
+  testnet = bytes([0x54])
+  #mainnet = bytes([0x4D])
+  publicHash = hashlib.sha256(master.PublicKey()).digest()[:20]
+  checksum = hashlib.sha256(hashlib.sha256(testnet + publicHash)).digest()[:4]
+
+  prewallet = base58.b58encode(testnet + publicHash + checksum).decode()
+
+  extraction = base58.b58decode(prewallet)
+  version = extraction[0:1]
+  publichash = extraction[1:21]
+  checkSum = extraction[21:25]
+  if hashlib.sha256(hashlib.sha256(version + publichash)).digest() == checkSum:
+    wallet = "bit" + prewallet + "annual"
+    return "Valid"
+  else:
+    return "Invalid"
+
+gen()
+
+if gen() == "Valid":
+  print(colored(f"PRIVATE KEY: {private}", "green", attrs=["bold"]))
+  print(colored(f"PUBLIC KEY: {public}", "green", attrs=["bold"]))
+  print(colored(f"WALLET ADDRESS: {wallet}", "green", attrs=["bold"]))
+  print(colored(f"MNEMONIC PHRASE: {seedphrase}", "green", attrs=["bold"]))
+else:
+  print(colored("INVALID CHECKSUM, REGENERATING...", "red", attrs=["bold"]))
+  time.sleep(2)
+  gen()
