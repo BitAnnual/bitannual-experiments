@@ -23,8 +23,8 @@ def gen():
   private = master.PrivateKey().hex()
   public = master.PublicKey().hex()
 
-  testnet = bytes([0x54])
-  #mainnet = bytes([0x4D])
+  testnet = bytes([hex(ord('T'))])
+  #mainnet = bytes([hex(ord('M'))])
   publicHash = hashlib.sha256(master.PublicKey()).digest()[:20]
   checksum = hashlib.sha256(hashlib.sha256(testnet + publicHash)).digest()[:4]
 
