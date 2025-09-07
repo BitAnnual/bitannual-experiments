@@ -23,10 +23,10 @@ def gen():
   private = master.PrivateKey().hex()
   public = master.PublicKey().hex()
 
-  testnet = bytes([hex(ord('T'))])
-  #mainnet = bytes([hex(ord('M'))])
+  testnet = bytes([ord('T')])
+  #mainnet = bytes([ord('M')])
   publicHash = hashlib.sha256(master.PublicKey()).digest()[:20]
-  checksum = hashlib.sha256(hashlib.sha256(testnet + publicHash)).digest()[:4]
+  checksum = hashlib.sha256(hashlib.sha256(testnet + publicHash).digest()).digest()[:4]
 
   prewallet = base58.b58encode(testnet + publicHash + checksum).decode()
 
@@ -34,7 +34,7 @@ def gen():
   version = extraction[0:1]
   publichash = extraction[1:21]
   checkSum = extraction[21:25]
-  if hashlib.sha256(hashlib.sha256(version + publichash)).digest() == checkSum:
+  if hashlib.sha256(hashlib.sha256(version + publichash).digest()).digest()[:4] == checkSum:
     wallet = "bit" + prewallet + "annual"
     return "Valid"
   else:
@@ -43,11 +43,11 @@ def gen():
 gen()
 
 if gen() == "Valid":
-  print(colored(f"PRIVATE KEY: {private}", "green", attrs=["bold"]))
-  print(colored(f"PUBLIC KEY: {public}", "green", attrs=["bold"]))
-  print(colored(f"WALLET ADDRESS: {wallet}", "green", attrs=["bold"]))
-  print(colored(f"MNEMONIC PHRASE: {seedphrase}", "green", attrs=["bold"]))
+        print(colored(f"PRIVATE KEY: {private}", "green", attrs=["bold"]))
+        print(colored(f"PUBLIC KEY: {public}", "green", attrs=["bold"]))
+        print(colored(f"WALLET ADDRESS: {wallet}", "green", attrs=["bold"]))
+        print(colored(f"MNEMONIC PHRASE: {seedphrase}", "green", attrs=["bold"]))
 else:
-  print(colored("INVALID CHECKSUM, REGENERATING...", "red", attrs=["bold"]))
-  time.sleep(2)
-  gen()
+    print(colored("INVALID CHECKSUM, REGENERATING...", "red", attrs=["bold"]))
+    time.sleep(2)
+    gen()
