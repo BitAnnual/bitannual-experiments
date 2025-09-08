@@ -47,7 +47,7 @@ def transaction():
   fee = (len(toAddress) + len(fromAddress) + len(str(amount)) + len(timestamp)) * 0.001
   signature = signingkey.sign_digest(hashlib.sha256(toAddress.encode("utf-8") + fromAddress.encode("utf-8") + str(amount).encode("utf-8") + timestamp.encode("utf-8") + str(fee).encode("utf-8")).digest())
   txid = hashlib.sha256(toAddress.encode("utf-8") + fromAddress.encode("utf-8") + str(amount).encode("utf-8") + timestamp.encode("utf-8") + str(fee).encode("utf-8") + signature).digest()
-  lengthoftransaction = len(toAddress) + len(fromAddress) + len(str(amount)) + len(timestamp) + len(str(fee)) + len(signature) + len(txid)
+  lengthoftransaction = (len(toAddress) + len(fromAddress) + len(str(amount)) + len(timestamp) + len(str(fee)) + len(signature) + len(txid)) / 8
   metadata = {"to": toAddress, "from": fromAddress, "amount": amount, "time": timestamp, "fee": fee, "signature": signature.hex(), "txid": txid.hex()}
   return txid, lengthoftransaction, metadata
 
@@ -58,7 +58,7 @@ def block():
   timestamp = str(time.time())
   difficultyTarget = target.to_bytes(32, "big")
   prevHash = "0"*64
-  lengthofblock = ((64*2) + 1 + len(str(nonce)) + len(timestamp) + len(str(target)) + 1) 
+  lengthofblock = ((64*2) + 1 + len(str(nonce)) + len(timestamp) + len(str(target)) + 1) / 8
   amountoftrans = (2147483648 - lengthofblock) // (transaction()[1] / 8)
   hashes = [transaction()[0] for _ in range(round(amountoftrans))]
   while len(hashes) > 1:
@@ -75,7 +75,7 @@ def block():
 print(colored(transaction()[2], "green", attrs=["bold"]))
 print("")
 print(colored(block()[0], "green", attrs=["bold"]))
-print(colored(f"ESTIMATED BITS OF A TRANSACTION: {transaction()[1]}", "white", attrs=["bold"]))
-print(colored(f"ESTIMATED BITS OF A BLOCK: {block()[1]}", "white", attrs=["bold"]))
+print(colored(f"ESTIMATED BYTES OF A TRANSACTION: {transaction()[1]}", "white", attrs=["bold"]))
+print(colored(f"ESTIMATED BYTES OF A BLOCK: {block()[1]}", "white", attrs=["bold"]))
   
   
