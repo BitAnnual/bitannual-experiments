@@ -70,8 +70,10 @@ def block():
       hashes = merkles
   merkleRoot = hashes[0]
   blockHash = hashlib.sha256(hashlib.sha256(version.to_bytes(4, "big") + height.to_bytes(4, "big") + nonce.to_bytes(10, "big") + timestamp.encode("utf-8") + difficultyTarget + bytes.fromhex(prevHash) + merkleRoot).digest()).hexdigest()
-  return {"version": version, "prevHash": prevHash, "merkle": merkleRoot.hex(), "timestamp": timestamp, "difficultyTarget": difficultyTarget.hex(), "nonce": nonce, "blockHash": blockHash}
+  return {"version": version, "prevHash": prevHash, "merkle": merkleRoot.hex(), "timestamp": timestamp, "difficultyTarget": difficultyTarget.hex(), "nonce": nonce, "blockHash": blockHash}, lengthofblock
 
-print(colored(block(), "green", attrs=["bold"]))
+print(colored(block()[0], "green", attrs=["bold"]))
+print(colored(f"ESTIMATED BITS OF A TRANSACTION: {transaction()[1]}", "white", attrs=["bold"]))
+print(colored(f"ESTIMATED BITS OF A BLOCK: {block()[1]}", "white", attrs=["bold"]))
   
   
