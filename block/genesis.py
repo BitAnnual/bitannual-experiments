@@ -49,7 +49,7 @@ def transaction():
   txid = hashlib.sha256(toAddress.encode("utf-8") + fromAddress.encode("utf-8") + str(amount).encode("utf-8") + timestamp.encode("utf-8") + str(fee).encode("utf-8") + signature).digest()
   lengthoftransaction = len(toAddress) + len(fromAddress) + len(str(amount)) + len(timestamp) + len(str(fee)) + len(signature) + len(txid)
   metadata = {"to": toAddress, "from": fromAddress, "amount": amount, "time": timestamp, "fee": fee, "signature": signature.hex(), "txid": txid.hex()}
-  return txid, lengthoftransaction
+  return txid, lengthoftransaction, metadata
 
 def block():
   version = 1
@@ -72,6 +72,8 @@ def block():
   blockHash = hashlib.sha256(hashlib.sha256(version.to_bytes(4, "big") + height.to_bytes(4, "big") + nonce.to_bytes(10, "big") + timestamp.encode("utf-8") + difficultyTarget + bytes.fromhex(prevHash) + merkleRoot).digest()).hexdigest()
   return {"version": version, "prevHash": prevHash, "merkle": merkleRoot.hex(), "timestamp": timestamp, "difficultyTarget": difficultyTarget.hex(), "nonce": nonce, "blockHash": blockHash}, lengthofblock
 
+print(colored(transaction()[2], "green", attrs=["bold"]))
+print("")
 print(colored(block()[0], "green", attrs=["bold"]))
 print(colored(f"ESTIMATED BITS OF A TRANSACTION: {transaction()[1]}", "white", attrs=["bold"]))
 print(colored(f"ESTIMATED BITS OF A BLOCK: {block()[1]}", "white", attrs=["bold"]))
