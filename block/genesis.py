@@ -58,7 +58,7 @@ def block():
   timestamp = str(time.time())
   difficultyTarget = target.to_bytes(32, "big")
   prevHash = "0"*64
-  lengthofblock = ((64*2) + 1 + len(str(nonce)) + len(timestamp) + len(str(target)) + 1) / 8
+  lengthofblock = ((64*2) + 1 + len(str(nonce)) + len(timestamp) + len(str(target)) + 1) 
   amountoftrans = (2147483648 - lengthofblock) // (transaction()[1] / 8)
   hashes = [transaction()[0] for _ in range(round(amountoftrans))]
   while len(hashes) > 1:
