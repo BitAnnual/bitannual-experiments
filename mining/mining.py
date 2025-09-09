@@ -81,5 +81,7 @@ def mine():
     if int(block()[2].hex(), 16) <= target:
       print(colored("[!] - BLOCK HAS BEEN MINED SUCCESSFULLY", "green", attrs=["bold"]))
       break
+
+mine()
   
   
