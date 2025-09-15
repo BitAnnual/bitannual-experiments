@@ -1,4 +1,5 @@
 from bip32utils import BIP32Key
+from Crypto.Hash import RIPEMD
 from mnemonic import Mnemonic
 from termcolor import colored
 import hashlib
@@ -23,9 +24,10 @@ def gen():
   private = master.PrivateKey().hex()
   public = master.PublicKey().hex()
 
-  testnet = bytes([ord('T')])
-  #mainnet = bytes([ord('M')])
-  publicHash = hashlib.sha256(master.PublicKey()).digest()[:20]
+  testnet = bytes([0x54])
+  #mainnet = bytes([0x4D])
+  ripemd = RIPEMD.new(master.PublicKey())
+  publicHash = ripemd.digest()
   checksum = hashlib.sha256(hashlib.sha256(testnet + publicHash).digest()).digest()[:4]
 
   prewallet = base58.b58encode(testnet + publicHash + checksum).decode()
