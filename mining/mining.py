@@ -1,4 +1,5 @@
 from bip32utils import BIP32Key
+from Crypto.Hash import RIPEMD
 from mnemonic import Mnemonic
 from termcolor import colored
 import hashlib
@@ -25,7 +26,8 @@ def addresses():
   private = master.PrivateKey().hex()
   signingkey = ecdsa.SigningKey.from_string(bytes.fromhex(private), curve=ecdsa.SECP256k1)
   version = bytes([ord("T")])
-  publicHash = hashlib.sha256(public).digest()[:20]
+  ripemd = RIPEMD.new(master.PublicKey())
+  publicHash = ripemd.digest()
   checksum = hashlib.sha256(hashlib.sha256(version + publicHash).digest()).digest()[:4]
   pre = base58.b58encode(version + publicHash + checksum).decode()
 
