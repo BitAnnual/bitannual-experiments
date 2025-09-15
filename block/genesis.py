@@ -1,4 +1,5 @@
 from bip32utils import BIP32Key
+from Crypto.Hash import RIPEMD
 from mnemonic import Mnemonic
 from termcolor import colored
 import hashlib
@@ -25,7 +26,8 @@ def addresses():
   private = master.PrivateKey().hex()
   signingkey = ecdsa.SigningKey.from_string(bytes.fromhex(private), curve=ecdsa.SECP256k1)
   version = bytes([ord("T")])
-  publicHash = hashlib.sha256(public).digest()[:20]
+  ripemd = RIPEMD.new(master.PublicKey())
+  publicHash = ripemd.digest()
   checksum = hashlib.sha256(hashlib.sha256(version + publicHash).digest()).digest()[:4]
   pre = base58.b58encode(version + publicHash + checksum).decode()
 
@@ -70,7 +72,12 @@ def block():
       hashes = merkles
   merkleRoot = hashes[0]
   blockHash = hashlib.sha256(hashlib.sha256(version.to_bytes(4, "big") + height.to_bytes(4, "big") + nonce.to_bytes(10, "big") + timestamp.encode("utf-8") + difficultyTarget + bytes.fromhex(prevHash) + merkleRoot).digest()).hexdigest()
-  return {"version": version, "prevHash": prevHash, "merkle": merkleRoot.hex(), "timestamp": timestamp, "difficultyTarget": difficultyTarget.hex(), "nonce": nonce, "blockHash": blockHash}, lengthofblock
+  blockdata = 
+  {
+    "header": {"version": version, "prevHash": prevHash, "merkle": merkleRoot.hex(), "timestamp": timestamp, "difficultyTarget": difficultyTarget.hex(), "nonce": nonce, "blockHash": blockHash},
+    "body": [transaction()[0] for _ in range(amountoftrans)]
+  }
+  return blockdata, lengthofblock
 
 print(colored(transaction()[2], "green", attrs=["bold"]))
 print("")
