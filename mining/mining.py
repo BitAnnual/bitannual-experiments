@@ -13,7 +13,7 @@ mnemonics = Mnemonic("english")
 signingkey = ""
 
 diff = 1000000000 * 31536000
-target = 2**256 // diff
+target = (2**224) * ((2**32) - 1) // diff
 
 def addresses():
   global signingkey
