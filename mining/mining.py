@@ -6,6 +6,7 @@ import hashlib
 import base58
 import random
 import ecdsa
+import json
 import time
 import os
 
@@ -54,12 +55,18 @@ def transaction():
   return txid, lengthoftransaction, metadata
 
 def block():
+  max = (2**32) - 1
   version = 1
-  height = 1
+  height = 0
+  if os.path.exists("blockchain.json"):
+    with open("blockchain.json", "r") as r:
+      heights = json.load(r)
+    latest = list(heights.keys())[-1]
+    height = read[latest]["height"] + 1
+  else:
+    height = 1
   nonce = 0
-  for counts in range(1, 2**80, +1):
-    nonce = counts
-    pass
+  extraNonce = 0
   timestamp = str(time.time())
   difficultyTarget = target.to_bytes(32, "big")
   prevHash = "0"*64
@@ -74,16 +81,24 @@ def block():
           merkles.append(hashlib.sha256(hashes[h] + hashes[h+1]).digest())
       hashes = merkles
   merkleRoot = hashes[0]
-  blockHash = hashlib.sha256(hashlib.sha256(version.to_bytes(4, "big") + height.to_bytes(4, "big") + nonce.to_bytes(10, "big") + timestamp.encode("utf-8") + difficultyTarget + bytes.fromhex(prevHash) + merkleRoot).digest()).hexdigest()
-  return {"version": version, "prevHash": prevHash, "merkle": merkleRoot.hex(), "timestamp": timestamp, "difficultyTarget": difficultyTarget.hex(), "nonce": nonce, "blockHash": blockHash}, lengthofblock, blockHash
+  while nonce < max:
+    blockHash = hashlib.sha256(hashlib.sha256(version.to_bytes(4, "big") + height.to_bytes(4, "big") + nonce.to_bytes(32, "big") + extraNonce.to_bytes(32, "big") + timestamp.encode("utf-8") + difficultyTarget + bytes.fromhex(prevHash) + merkleRoot).digest()).hexdigest()
+    if int(blockHash, 16) <= target:
+      print(colored("Block Has Been Mined After A Whole Year!", "green", attrs=["bold"]))
+      blockdata = 
+      {
+        "header": {"version": version, "prevHash": prevHash, "merkle": merkleRoot.hex(), "timestamp": timestamp, "difficultyTarget": difficultyTarget.hex(), "nonce": nonce, "blockHash": blockHash},
+        "body": [transaction()[0] for _ in range(amountoftrans)]
+      }
+      if os.path.exists("blockchain.json"):
+        with open("blockchain.json", "w") as w:
+          json.dump(blockData, w, indent=4)
+      else:
+        with open("blockchain.json", "w") as w:
+          json.dump(blockData, w, indent=4)
+      block()
+  nonce += 1
+  if nonce >= max:
+    extraNonce += 1
 
-def mine():
-  print(colored("[!] - MINING...", "yellow", attrs=["bold"]))
-  while True:
-    if int(block()[2].hex(), 16) <= target:
-      print(colored("[!] - BLOCK HAS BEEN MINED SUCCESSFULLY", "green", attrs=["bold"]))
-      break
-
-mine()
-  
-  
+block()
